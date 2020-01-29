@@ -35,8 +35,8 @@ dense21 = Dense(7)(input2)
 dense22 = Dense(4)(dense21)
 output2 = Dense(5)(dense22) #output1/2가 달라도 merge 가능-> 아직 hidden layer(y)
 
-from keras.layers.merge import concatenate
-merge1 = concatenate([output1, output2])
+from keras.layers import Concatenate, concatenate
+merge1 = Concatenate(axis=1)([output1, output2])
 middle1 = Dense(4)(merge1)
 middle2 = Dense(7)(middle1)
 output = Dense(1)(middle2)
@@ -55,10 +55,10 @@ model.summary()
 
 # 훈련
 model.compile(loss='mse', optimizer='adam', metrics=['mse']) # mse, mae 사용
-model.fit([x1_train, x2_train], y1_train, epochs=100, batch_size = 1, validation_split = 0, validation_data = ([x1_val, x2_val], y1_val)) 
+model.fit([x1_train, x2_train], [y1_train], epochs=100, batch_size = 1, validation_split = 0, validation_data = ([x1_val, x2_val], [y1_val])) 
 
 # 평가예측
-loss, mse = model.evaluate([x1_test, x2_test], y1_test, batch_size = 1)
+loss, mse = model.evaluate([x1_test, x2_test], [y1_test], batch_size = 1)
 print('mse:', mse)
 
 # # 예측

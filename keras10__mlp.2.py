@@ -32,7 +32,7 @@ model.summary()
 model.compile(loss='mse', optimizer='adam', metrics=['mse']) # mse, mae 사용
 model.fit(x_train, y_train, epochs=100, batch_size = 1, validation_split = 0, validation_data = (x_val, y_val)) 
 
-# 평가예측
+# 평가예측 #evaluate 반환값 2개 loss, mse 각 1개씩
 loss, mse = model.evaluate(x_test, y_test, batch_size = 1)
 print('mse:', mse)
 
