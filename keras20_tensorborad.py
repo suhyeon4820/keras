@@ -1,14 +1,14 @@
 import numpy as np    
 # 데이터
-x = np.array([range(1, 101), range(101, 201)])
-y = np.array([range(1, 101), range(101, 201)])
-print(x.shape)  #(2, 10)
-print(y.shape)  #(2, 10)
+x = np.array([range(1, 101), range(101, 201), range(301, 401)])
+y = np.array([range(101, 201)])
+print(x.shape)  #(3, 100)
+print(y.shape)  #(1, 100)
 
 x = np.transpose(x)
 y = np.transpose(y)
-print(x.shape)  #(10, 2)
-print(y.shape)  #(10, 2)
+print(x.shape)  #(100, 3) input
+print(y.shape)  #(100, 1) output
 
 from sklearn.model_selection import train_test_split
 
@@ -20,23 +20,29 @@ from keras.models import Sequential
 from keras.layers import Dense
 
 model = Sequential() # 연속적인 model layer
-model.add(Dense(10, input_shape = (2, ))) # input_shape : 2차원 
-model.add(Dense(10))
+model.add(Dense(1, input_shape = (3, ))) # input_shape : 2차원 
+model.add(Dense(20))
+model.add(Dense(20))
 model.add(Dense(10)) # layer 2 추가(node : 10개)
-model.add(Dense(2)) # outputlayer (node : 2개)
+model.add(Dense(1)) # outputlayer (node : 1개)
 
 model.summary()
 
 # 훈련
 model.compile(loss='mse', optimizer='adam', metrics=['mse']) # mse, mae 사용
-model.fit(x_train, y_train, epochs=100, batch_size = 1, validation_split = 0, validation_data = (x_val, y_val)) 
 
-# 평가예측
+from keras.callbacks import EarlyStopping, TensorBoard
+tb_hist = TensorBoard(log_dir='./graph', histogram_freq=0, write_graph=True, write_images=True)
+
+early_stopping = EarlyStopping(monitor = 'loss', patience = 40, mode = 'min') # monitor=loss(mode=auto/min), monitor=accuracy(mode=max)
+model.fit(x_train, y_train, epochs=100, batch_size = 1, validation_split = 0, validation_data = (x_val, y_val), callbacks=[early_stopping, tb_hist]) 
+
+# 평가예측 #evaluate 반환값 2개 loss, mse 각 1개씩
 loss, mse = model.evaluate(x_test, y_test, batch_size = 1)
 print('mse:', mse)
 
 # # 예측
-x_pred = np.array([[200, 201, 202], [203, 204, 205]])
+x_pred = np.array([[200, 201, 202], [203, 204, 205], [206, 207, 208]])
 x_pred = np.transpose(x_pred)
 aaa = model.predict(x_pred, batch_size = 1)
 print(aaa)
@@ -55,6 +61,3 @@ print('print r_mse :', np.sqrt(mse))
 from sklearn.metrics import r2_score
 r2_y_predict = r2_score(y_test, y_pred)
 print('R2 : ', r2_y_predict)  #R2는 최대값이 1로 1에 가까울수록 정확함
-
-print(y_test.shape)
-print(y_pred.shape)
